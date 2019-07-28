@@ -1,3 +1,4 @@
+import 'package:bitcoin_ticker/services/bitcoin.dart';
 import 'package:flutter/material.dart';
 import "coin_data.dart";
 import 'package:flutter/cupertino.dart';
@@ -9,7 +10,11 @@ class PriceScreen extends StatefulWidget {
 }
 
 class _PriceScreenState extends State<PriceScreen> {
+  BitCoin bitcoin = BitCoin();
   String selectedCurrency = "USD";
+  int bitcoinPrice;
+  int etheriumPrice;
+  int litecoinPrice;
 
   DropdownButton<String> androidDropdown() {
     List<DropdownMenuItem<String>> dropDownItems = [];
@@ -35,7 +40,13 @@ class _PriceScreenState extends State<PriceScreen> {
     }
     return (CupertinoPicker(
       itemExtent: 32.0,
-      onSelectedItemChanged: (selectedIndex) {},
+      onSelectedItemChanged: (selectedIndex) async {
+        var res = await bitcoin.getQuote(currenciesList[selectedIndex]);
+        setState(() => {
+              selectedCurrency = currenciesList[selectedIndex],
+              bitcoinPrice = res['last'].toInt()
+            });
+      },
       children: cupertinoItems,
       backgroundColor: Colors.lightBlue,
     ));
@@ -62,7 +73,7 @@ class _PriceScreenState extends State<PriceScreen> {
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
                 child: Text(
-                  '1 BTC = ? USD',
+                  '1 BTC = $bitcoinPrice $selectedCurrency',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 20.0,
